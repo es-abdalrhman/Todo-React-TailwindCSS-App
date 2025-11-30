@@ -1,0 +1,26 @@
+/* Background overlay */
+.pop-back {
+    position: fixed;
+    /* so it covers the whole screen */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.65);
+    display: flex;
+    /* to center popup */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Popup box */
+.popup {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 300px;
+    max-width: 90%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1100;
+}
