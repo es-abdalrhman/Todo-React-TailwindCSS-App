@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -19,39 +19,46 @@ function App() {
   const [todoList, setTodoList] = useState([{
     id: 1,
     status: 2,
-    title: "object 1",
+    title: "task 1",
     describtion: " Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit quibusdam illum, officiis assumenda id totam nostrum voluptatibus ullam, cupiditate alias magnam necessitatibus sunt non corporis modi repudiandae sit libero?"
   },
   {
     id: 5,
     status: 1,
-    title: "object 1",
+    title: "task 2",
     describtion: " Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit quibusdam illum, officiis assumenda id totam nostrum voluptatibus ullam, cupiditate alias magnam necessitatibus sunt non corporis modi repudiandae sit libero?"
   },
   {
     id: 4,
     status: 2,
-    title: "object 1",
+    title: "task 3",
     describtion: " Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit quibusdam illum, officiis assumenda id totam nostrum voluptatibus ullam, cupiditate alias magnam necessitatibus sunt non corporis modi repudiandae sit libero?"
   },
   {
     id: 7,
     status: 1,
-    title: "object 1",
+    title: "task 4",
     describtion: " Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit quibusdam illum, officiis assumenda id totam nostrum voluptatibus ullam, cupiditate alias magnam necessitatibus sunt non corporis modi repudiandae sit libero?"
   },
   {
     id: 2,
     status: 1,
-    title: "object 2",
+    title: "task 5",
     describtion: " Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit quibusdam illum, officiis assumenda id totam nostrum voluptatibus ullam, cupiditate alias magnam necessitatibus sunt non corporis modi repudiandae sit libero?"
   },
   {
     id: 3,
     status: 2,
-    title: "object 3",
+    title: "task 6",
     describtion: " Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aliquid velit quibusdam illum, officiis assumenda id totam nostrum voluptatibus ullam, cupiditate alias magnam necessitatibus sunt non corporis modi repudiandae sit libero?"
   }]);
+
+  useEffect(() => {
+    const storedTodos = JSON.parse(localStorage.getItem("todoList"));
+    if (storedTodos && Array.isArray(storedTodos)) {
+      setTodoList(storedTodos);
+    }
+  }, [todoList]);
   function handleTitleChange(newTitle) {
     setNewTask({ ...newTask, title: newTitle });
   }
@@ -74,6 +81,7 @@ function App() {
       }
     }
   }
+  localStorage.setItem("hello", "world");
   //                any   ,    1  ,     2
   const buttons = ["All", "done", "waiting"];
   function handleNewTask(newTask) {
@@ -84,8 +92,12 @@ function App() {
       lastId = Math.max(lastId, todoItem.id);
     }
     newTask.id = lastId + 1;
-    setTodoList([...todoList, newTask]);
+    const updatedList = [...todoList, newTask];
+    setTodoList(updatedList);
+    localStorage.setItem("todoList", JSON.stringify(updatedList));
+
   };
+
   // set the edits 
   function setAllEdits(editedTask, editIndex) {
     setIsEditing(true);
@@ -106,7 +118,9 @@ function App() {
     setAllEdits(editedTask, editIndex);
   }
   function finishedEditing(editingTask) {
-    setTodoList(todoList.map(item => item.id == editingTask.id ? editingTask : item));
+    const updatedList = todoList.map(item => item.id == editingTask.id ? editingTask : item);
+    setTodoList(updatedList);
+    localStorage.setItem("todoList", JSON.stringify(updatedList));
     setIsEditing(false);
   }
 

@@ -24,6 +24,7 @@ export default function TodoList({ todoList, buttonKey, updateTodoList,editTask 
       }
     }
     updateTodoList(updatedList);
+    localStorage.setItem("todoList", JSON.stringify(updatedList));
   }
   function handleDoneTask(doneTaskId) {
     let updatedList = [];
@@ -35,6 +36,9 @@ export default function TodoList({ todoList, buttonKey, updateTodoList,editTask 
       }
     }
     updateTodoList(updatedList);
+    localStorage.setItem("todoList", JSON.stringify(updatedList));
+
+    
   }
   
   return (
