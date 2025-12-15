@@ -1,19 +1,20 @@
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CheckIcon from '@mui/icons-material/Check';
+import { SnackbarContext } from "./context/snackbarContext"
 
 import { useTheme } from '@mui/material/styles';
 import { green, red, orange, yellow } from "@mui/material/colors";
-
+import { useContext } from 'react';
 import "./Todolist.css";
 import { useState } from 'react';
 // there is a problem in the layout the icons should be in the bottom right corner 
-export default function TodoList({ todoList, buttonKey, updateTodoList,editTask }) {
-  
+export default function TodoList({ todoList, buttonKey, updateTodoList, editTask }) {
+  const { open, setOpen, message, setMessage, handleSnackbarShow } = useContext(SnackbarContext);
+
   console.log(buttonKey);
   console.log(todoList);
   const theme = useTheme();
-
 
   function handleDeleteTask(deletedId) {
     console.log("this is the deleted id :", deletedId);
@@ -25,22 +26,30 @@ export default function TodoList({ todoList, buttonKey, updateTodoList,editTask 
     }
     updateTodoList(updatedList);
     localStorage.setItem("todoList", JSON.stringify(updatedList));
+    setMessage("Delete is done");
+    handleSnackbarShow();
   }
   function handleDoneTask(doneTaskId) {
     let updatedList = [];
+    let wasNotDone = false;
+
     for (let i = 0; i < todoList.length; i++) {
       if (todoList[i].id !== doneTaskId) {
         updatedList.push(todoList[i]);
       } else {
+        wasNotDone = todoList[i].status !== 1;
         updatedList.push({ ...todoList[i], status: 1 });
       }
     }
     updateTodoList(updatedList);
     localStorage.setItem("todoList", JSON.stringify(updatedList));
-
-    
+    if (wasNotDone) {
+      console.log(wasNotDone);
+      setMessage("made this task done");
+      handleSnackbarShow();
+    }
   }
-  
+
   return (
     <>
 
@@ -62,7 +71,7 @@ export default function TodoList({ todoList, buttonKey, updateTodoList,editTask 
         ))}
       </div>
       {/* {console.log(editingTask)} */}
-      
+
     </>
   );
 }

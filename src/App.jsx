@@ -7,9 +7,15 @@ import Button from '@mui/material/Button';
 import TodoList from './TodoList';
 import TextField from '@mui/material/TextField';
 import EditPopUp from './EditPopUp';
+import MySnackbar from './Snackbar';
 import "./edit-popup.css"
+import { SnackbarContext } from './context/snackbarContext';
 // import from "react-router-dom";
 function App() {
+  // snackbar states
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  // ------------------- 
   const [isEditing, setIsEditing] = useState(false);
   const [editingTask, setEditingTask] = useState({});
   const [editingIndex, setEditingIndex] = useState(0);
@@ -58,7 +64,13 @@ function App() {
     if (storedTodos && Array.isArray(storedTodos)) {
       setTodoList(storedTodos);
     }
-  }, [todoList]);
+  }, []);
+  function handleSnackbarShow() {
+    setOpen(true);
+    setTimeout(() => {
+      setOpen(false);
+    }, 2000);
+  }
   function handleTitleChange(newTitle) {
     setNewTask({ ...newTask, title: newTitle });
   }
@@ -81,7 +93,6 @@ function App() {
       }
     }
   }
-  localStorage.setItem("hello", "world");
   //                any   ,    1  ,     2
   const buttons = ["All", "done", "waiting"];
   function handleNewTask(newTask) {
@@ -95,6 +106,8 @@ function App() {
     const updatedList = [...todoList, newTask];
     setTodoList(updatedList);
     localStorage.setItem("todoList", JSON.stringify(updatedList));
+    setMessage("new task added");
+    handleSnackbarShow();
 
   };
 
@@ -116,48 +129,56 @@ function App() {
     }
     console.log(editedTask);
     setAllEdits(editedTask, editIndex);
+    // handleSnackbarShow();
   }
   function finishedEditing(editingTask) {
     const updatedList = todoList.map(item => item.id == editingTask.id ? editingTask : item);
     setTodoList(updatedList);
     localStorage.setItem("todoList", JSON.stringify(updatedList));
+    handleSnackbarShow()
+    setMessage("the task is edited correctly");
     setIsEditing(false);
+
   }
 
 
   return (
-    <div className="App">
-      <h1 className='mb-3' id='project-title' style={{ justifySelf: "center", fontSize: "80px" }}>TODO Project</h1>
-      <Container maxWidth="md" style={{ display: "flex", justifyContent: "center", translate: "0 0", gap: "5px" }}>
-        {buttons.map((button, index) => {
-          return (<Button variant={(index === buttonKey) ? "contained" : "outlined"} key={index} onClick={() => { { setButtonKey(index) } }}>{button}</Button>)
-        })}
-      </Container>
-      <Container className='w-full m-2' style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: "5px" }}>
-        <TodoList todoList={todoList} buttonKey={buttonKey} updateTodoList={setTodoList} editTask={handleEditTask} />
-      </Container>
-      <div className='grid grid-cols-1 gap-1 max-w-2xs justify-self-center'>
-        <h3 className='text-blue-600 dark:text-sky-400 mb-2'>CREATE A NEW TASK</h3>
-        <TextField id="outlined-basic" label="Task title" variant="outlined" className='bg-amber-50 rounded-sm' onChange={e => handleTitleChange(e.target.value)} value={newTask.title} />
-        <br />
-        <TextField
-          className='bg-amber-50 m-2 rounded-sm'
-          id="outlined-multiline-static"
-          label="Task Describtion"
-          multiline
-          value={newTask.describtion}
-          rows={4}
-          onChange={e => handleDescribtionChange(e.target.value)}
-        // placeholder="Task Description"
-        />
-        <Button variant="contained" style={{ display: "flex", justifySelf: "center", width: "fit-content" }}
-          onClick={() => {
-            handleNewTask(newTask);
-            setNewTask({ ...newTask, title: "", describtion: "" });
-          }}>add Task</Button>
-      </div>
-      {isEditing ? <EditPopUp editingTask={editingTask} ignoreEdit={ignoreEdit} setEditingTask={setEditingTask} finishedEditing={finishedEditing} /> : null}
-    </div>
+
+    <SnackbarContext.Provider value={{ open, setOpen, message, setMessage, handleSnackbarShow }}>
+      <div className="App">
+        <h1 className='mb-3' id='project-title' style={{ justifySelf: "center", fontSize: "80px" }}>TODO Project</h1>
+        <Container maxWidth="md" style={{ display: "flex", justifyContent: "center", translate: "0 0", gap: "5px" }}>
+          {buttons.map((button, index) => {
+            return (<Button variant={(index === buttonKey) ? "contained" : "outlined"} key={index} onClick={() => { { setButtonKey(index) } }}>{button}</Button>)
+          })}
+        </Container>
+        <Container className='w-full m-2' style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: "5px" }}>
+          <TodoList todoList={todoList} buttonKey={buttonKey} updateTodoList={setTodoList} editTask={handleEditTask} />
+        </Container>
+        <div className='grid grid-cols-1 gap-1 max-w-2xs justify-self-center'>
+          <h3 className='text-blue-600 dark:text-sky-400 mb-2'>CREATE A NEW TASK</h3>
+          <TextField id="outlined-basic" label="Task title" variant="outlined" className='bg-amber-50 rounded-sm' onChange={e => handleTitleChange(e.target.value)} value={newTask.title} />
+          <br />
+          <TextField
+            className='bg-amber-50 m-2 rounded-sm'
+            id="outlined-multiline-static"
+            label="Task Describtion"
+            multiline
+            value={newTask.describtion}
+            rows={4}
+            onChange={e => handleDescribtionChange(e.target.value)}
+          // placeholder="Task Description"
+          />
+          <Button variant="contained" style={{ display: "flex", justifySelf: "center", width: "fit-content" }}
+            onClick={() => {
+              handleNewTask(newTask);
+              setNewTask({ ...newTask, title: "", describtion: "" });
+            }}>add Task</Button>
+        </div>
+        {isEditing ? <EditPopUp editingTask={editingTask} ignoreEdit={ignoreEdit} setEditingTask={setEditingTask} finishedEditing={finishedEditing} /> : null}
+        {open ? <MySnackbar /> : null}
+      </div >
+    </SnackbarContext.Provider >
   );
 }
 
